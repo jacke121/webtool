@@ -167,10 +167,11 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		  
 		implSb.append("  		              long result = stat.executeInsert();\n");		 
 		implSb.append("  		                if (result < 0) {\n");		 
-		implSb.append("  		                    return false;\n");		 
-		implSb.append("  		                }\n");		 
-		implSb.append("  		            }\n");		 
-		implSb.append("  		            db.setTransactionSuccessful();\n");		 
+		implSb.append("  		                    return false;\n");
+		implSb.append("  		                }\n");
+		implSb.append("  		            entity.id=(int)result;\n");
+		implSb.append("  		            }\n");
+		implSb.append("  		            db.setTransactionSuccessful();\n");
 		implSb.append("  		        } catch (Exception e) {\n");		 
 		implSb.append("  		            e.printStackTrace();\n");		 
 		implSb.append("             return false;\n");	

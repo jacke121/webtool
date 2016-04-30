@@ -87,7 +87,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 			}
 			else if(type.equals("index")){
 				String sql = rs.getString("sql");
-				sql= sql.replace("CREATE INDEX", "CREATE INDEX IF NOT EXISTS");
+				sql= sql.replace(" INDEX ", " INDEX IF NOT EXISTS ");
 				implSb.append("        mOpenHelper.getWritableDatabase().execSQL(\"" +sql + "\"); \n");
 			}
 

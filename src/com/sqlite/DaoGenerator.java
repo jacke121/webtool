@@ -55,8 +55,7 @@ public class DaoGenerator implements Generator {
 		implSb.append("import java.text.SimpleDateFormat;\n");
 		implSb.append("import android.util.SparseArray;\n");
 		implSb.append("import android.database.sqlite.SQLiteStatement;\n");
-		
-		
+		implSb.append("import java.text.ParseException;\n");
 		implSb.append("import java.util.concurrent.locks.Lock;\n");
 		implSb.append("import java.util.concurrent.locks.ReentrantLock;\n");
 
@@ -399,7 +398,18 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 			}
 			else if (entry.getValue().startsWith("Double")) {
 				implSb.append("    entity." + columnName + "=cursor.isNull(cOLUMNINDEXS." + columnName
-						+ " )? 0 :cursor.getDouble(cOLUMNINDEXS." + columnName + ");\n");
+								+ " )? 0 :cursor.getDouble(cOLUMNINDEXS." + columnName + ");\n");
+			}else if (entry.getValue().startsWith("Date")) {
+
+				implSb.append("    	Date date"+ columnName + "  = null;");
+				implSb.append("   	try {");
+				implSb.append("   	if(!cursor.isNull(cOLUMNINDEXS." + columnName + " )){");
+				implSb.append("   		date"+ columnName + " = (Date) dfu.parse(cursor.getString(cOLUMNINDEXS." + columnName + "));");
+				implSb.append("   			}");
+				implSb.append("   			} catch (ParseException e) {");
+				implSb.append("   			e.printStackTrace();");
+				implSb.append("   			}");
+				implSb.append("   	entity." + columnName + "=date"+ columnName + ";");
 			}
 		}
 	}

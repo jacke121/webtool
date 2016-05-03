@@ -315,8 +315,8 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("      }catch(Exception ex){ \n  ex.printStackTrace();");
 		implSb.append("       }finally{ \n if (cursor!= null) cursor.close();\n    }   return null;\n }");
 		// 批量更新
-		modifytable(tableName, 1);
-		modifytable(tableName, 2);// 参数查找
+		modifytable(tableName, 1,columns);
+		modifytable(tableName, 2,columns);
 		implSb.append("		public Long getUpgrade( SQLiteDatabase db ){\n");
 		implSb.append("	    Long strid = 0l;\n");
 				implSb.append("	    Cursor cursor =  mOpenHelper.getReadableDatabase().rawQuery(\"select last_insert_rowid() from " + tableName+"\", null);\n");
@@ -440,7 +440,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 
 	}
 
-	public void modifytable(String tableName, int type) {
+	public void modifytable(String tableName, int type, List<Entry<String, String>> columns) {
 
 		
 
@@ -449,19 +449,84 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		
 		// 编辑
 		if (type == 1) {
+
 			implSb.append("       public boolean update(" + NamingUtil.getClassName(tableName) + " entity){\n ");
+			implSb.append("              if ( entity == null) {\n");
+			implSb.append("                  return false;\n");
+			implSb.append("              }\n");
 			implSb.append("        lock.lock();\n ");
-			 
-			implSb.append("        SQLiteDatabase db=mOpenHelper.getWritableDatabase();\n");
-			implSb.append("         try{\n ");
-			//implSb.append("         entity.upgradeFlag=getUpgrade(db);\n ");
-			implSb.append("         return update0(db, entity, cOLUMNS." + pk
-					+ "+\"=?\", new String[]{String.valueOf(entity." + pk + ")} );\n ");
-			implSb.append("        }catch (Exception e) { e.printStackTrace();\n} finally {\n ");
+			implSb.append("                       SQLiteDatabase db = mOpenHelper.getWritableDatabase();\n");
+			implSb.append("                      try {\n");
+
+			implSb.append("   	            String sql =\"update " +tableName+" set ");
+
+			for (int i = 0; i < columns.size(); i++) {
+				Entry<String, String> entry = columns.get(i);
+				String columnName = NamingUtil.getInstanceName(entry.getKey());
+				if(i==columns.size()-1){
+					implSb.append(columnName +  "=? where id=?\";\n");
+				}
+				else{
+					implSb.append(columnName +  "=?,");
+				}
+			}
+			implSb.append("   	            SQLiteStatement stat = db.compileStatement(sql);\n");
+			implSb.append("   	            db.beginTransaction();\n");
+
+			for (int i = 0; i < columns.size(); i++) {
+				Entry<String, String> entry = columns.get(i);
+				String columnName = NamingUtil.getInstanceName(entry.getKey());
+				if (entry.getValue().contains("Int")||entry.getValue().startsWith("Long")) {
+
+					implSb.append("  if(null==entity."+ columnName + ") ");
+					if(columnName.toLowerCase().equals("lifestatus")){
+						implSb.append("   stat.bindLong("+(i+1)+",1);else\n");
+					}else if(columnName.toLowerCase().equals("upgradeflag")){
+						implSb.append("   stat.bindLong("+(i+1)+",1);else\n");
+					}else{
+						implSb.append("   stat.bindNull("+(i+1)+"); else\n");
+					}
+
+					implSb.append("   stat.bindLong(" +(i+1)+",entity."+ columnName + ");\n");
+				} else if (entry.getValue().startsWith("String")) {
+					implSb.append("  if(null==entity."+ columnName + "||entity."+ columnName +".length()==0) ");
+					implSb.append("   stat.bindNull("+(i+1)+");else\n");
+					implSb.append("   stat.bindString(" +(i+1)+",entity."+ columnName + ");\n");
+				}
+				else if (entry.getValue().toLowerCase().startsWith("float")||entry.getValue().toLowerCase().startsWith("double")) {
+					implSb.append("   stat.bindDouble(" +(i+1)+",entity."+ columnName + ");\n");
+				}
+				else if (entry.getValue().contains("Date")) {
+//					implSb.append("  if(null==entity."+ columnName + ") ");
+//					implSb.append("   stat.bindNull("+(i+1)+"); else\n");
+					implSb.append("   stat.bindString(" +(i+1)+",dfu.format(new Date()));\n");
+				}
+				if(i==columns.size()-1){
+					implSb.append("   stat.bindLong(" +(i+2)+",entity.id);\n");
+				}
+
+			}
+
+			implSb.append("  		              long result = stat.executeUpdateDelete();\n");
+			implSb.append("  		                if (result < 0) {\n");
+			implSb.append("  		                    return false;\n");
+			implSb.append("  		                }\n");
+			implSb.append("  		            db.setTransactionSuccessful();\n");
+			implSb.append("  		        } catch (Exception e) {\n");
+			implSb.append("  		            e.printStackTrace();\n");
+			implSb.append("             return false;\n");
+			implSb.append("         } finally {\n");
 			implSb.append("        lock.unlock();\n ");
-			implSb.append("        }\n ");
-			implSb.append("                     return false;\n ");
-			implSb.append("        }\n ");
+			implSb.append("             try {\n");
+			implSb.append("                     if (null != db) {\n");
+			implSb.append("                         db.endTransaction();\n");
+			implSb.append("                     }\n");
+			implSb.append("                 } catch (Exception e) {\n");
+			implSb.append("                     e.printStackTrace();\n");
+			implSb.append("     	            }\n");
+			implSb.append("             }\n");
+			implSb.append("             return true;\n");
+			implSb.append("         }\n");
 
 		}
 		// 删除

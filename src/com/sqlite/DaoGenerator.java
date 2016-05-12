@@ -131,7 +131,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("   	            SQLiteStatement stat = db.compileStatement(sql);\n");
 		implSb.append("   	            db.beginTransaction();\n");
         implSb.append("   	             for (int i=0;i<list.size();i++)  {\n");
-        implSb.append("   "+NamingUtil.getClassName(tableName)+" entity = list.get(i);  \n");
+        implSb.append("   "+NamingUtil.getClassName(tableName)+" entity = list.get(list.keyAt(i));  \n");
 		
 		for (int i = 0; i < columns.size(); i++) {
 			Entry<String, String> entry = columns.get(i);

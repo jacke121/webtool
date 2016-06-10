@@ -20,7 +20,8 @@ public static void main(String[] args) {
     ConfigUtil.initTargetFolder("sqlite");
     Class.forName("org.sqlite.JDBC");
     Launch.con = DriverManager.getConnection("jdbc:sqlite:D:/project/android/androidTower/lbstock.db");
-//     Launch.con = DriverManager.getConnection("jdbc:sqlite:D:/project/android/androidTower/tagan.db");
+   //  Launch.con = DriverManager.getConnection("jdbc:sqlite:D:/project/android/androidTower/tagan.db");
+//    Launch.con = DriverManager.getConnection("jdbc:sqlite:D:/project/android/diyaganta/diya.db");
     Launch.con.setAutoCommit(false);
   } catch (ClassNotFoundException e) {
     // TODO Auto-generated catch block

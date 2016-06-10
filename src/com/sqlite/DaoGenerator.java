@@ -128,6 +128,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		}
 	
 		implSb.append("        + \") \" + \"values("+wenhao.substring(1)+")\";\n");
+		implSb.append("   	            String createdate= dfu.format(new Date());\n");
 		implSb.append("   	            SQLiteStatement stat = db.compileStatement(sql);\n");
 		implSb.append("   	            db.beginTransaction();\n");
         implSb.append("   	             for (int i=0;i<list.size();i++)  {\n");
@@ -159,7 +160,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 			else if (entry.getValue().contains("Date")) {
 //					implSb.append("  if(null==entity."+ columnName + ") ");
 //					implSb.append("   stat.bindNull("+(i+1)+"); else\n");
-				implSb.append("   stat.bindString(" +(i+1)+",dfu.format(new Date()));\n");
+				implSb.append("   stat.bindString(" +(i+1)+",createdate);\n");
 			} 
 			 
 		}
@@ -191,6 +192,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("                  return false;\n");
 		implSb.append("              }\n");
 		implSb.append("                       SQLiteDatabase db = mOpenHelper.getWritableDatabase();\n");
+		implSb.append("   	            			String createdate= dfu.format(new Date());\n");
 		implSb.append("                      try {\n");
 		           
 		implSb.append("   	            String sql =\"update " +tableName+" set ");
@@ -236,7 +238,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 			else if (entry.getValue().contains("Date")) {
 //					implSb.append("  if(null==entity."+ columnName + ") ");
 //					implSb.append("   stat.bindNull("+(i+1)+"); else\n");
-				implSb.append("   stat.bindString(" +(i+1)+",dfu.format(new Date()));\n");
+				implSb.append("   stat.bindString(" +(i+1)+",createdate);\n");
 			} 
 			 if(i==columns.size()-1){
 					implSb.append("   stat.bindLong(" +(i+2)+",entity.id);\n"); 

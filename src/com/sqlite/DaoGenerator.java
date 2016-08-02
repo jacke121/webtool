@@ -194,7 +194,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("                       SQLiteDatabase db = mOpenHelper.getWritableDatabase();\n");
 		implSb.append("   	            			String createdate= dfu.format(new Date());\n");
 		implSb.append("                      try {\n");
-		           
+		implSb.append("       synchronized(SYNC){\n");
 		implSb.append("   	            String sql =\"update " +tableName+" set ");
 		
 		for (int i = 0; i < columns.size(); i++) {
@@ -251,7 +251,8 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("  		                    return false;\n");		 
 		implSb.append("  		                }\n");		 
 		implSb.append("  		            }\n");		 
-		implSb.append("  		            db.setTransactionSuccessful();\n");		 
+		implSb.append("  		            db.setTransactionSuccessful();\n");
+		implSb.append("      }\n");
 		implSb.append("  		        } catch (Exception e) {\n");		 
 		implSb.append("  		            e.printStackTrace();\n");		 
 		implSb.append("             return false;\n");	
@@ -272,7 +273,6 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("     Cursor cursor=null;\n");
 		implSb.append("     int index=0;\n");
 		implSb.append("     try{\n");
-		implSb.append("       synchronized(SYNC){\n");
 		implSb.append("      if ( (cursor =  mOpenHelper.getReadableDatabase().rawQuery(sql, whereArgs))==null || cursor.getCount()<1)return null;\n");
 		implSb.append("     SparseArray<" + NamingUtil.getClassName(tableName) + "> list = new SparseArray<"
 				+ NamingUtil.getClassName(tableName) + ">(cursor.getCount());\n");
@@ -288,7 +288,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("      cursor.close(); \n");
 		implSb.append("      return list; \n");
 
-		implSb.append("      }\n");
+	//	implSb.append("      }\n");
 		implSb.append("      }catch(Exception ex){ \n  ex.printStackTrace();");
 		implSb.append("       }finally{ \n if (cursor!= null) cursor.close();\n    }   return null;\n }\n");
 		//------------
@@ -297,7 +297,6 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("     Cursor cursor=null;\n");
 		implSb.append("     int index=0;\n");
 		implSb.append("     try{\n");
-		implSb.append("       synchronized(SYNC){\n");
 		implSb.append("      if ( (cursor = query(whereClause, whereArgs) )==null || cursor.getCount()<1)return null;\n");
 		implSb.append("     SparseArray<" + NamingUtil.getClassName(tableName) + "> list = new SparseArray<"
 				+ NamingUtil.getClassName(tableName) + ">(cursor.getCount());\n");
@@ -312,8 +311,6 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 
 		implSb.append("      cursor.close(); \n");
 		implSb.append("      return list; \n");
-
-		implSb.append("      }\n");
 		implSb.append("      }catch(Exception ex){ \n  ex.printStackTrace();");
 		implSb.append("       }finally{ \n if (cursor!= null) cursor.close();\n    }   return null;\n }");
 		// 批量更新
@@ -456,7 +453,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 			implSb.append("              if ( entity == null) {\n");
 			implSb.append("                  return false;\n");
 			implSb.append("              }\n");
-			implSb.append("        lock.lock();\n ");
+			implSb.append("       synchronized(SYNC){\n");
 			implSb.append("                       SQLiteDatabase db = mOpenHelper.getWritableDatabase();\n");
 			implSb.append("                      try {\n");
 
@@ -518,13 +515,14 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 			implSb.append("  		            e.printStackTrace();\n");
 			implSb.append("             return false;\n");
 			implSb.append("         } finally {\n");
-			implSb.append("        lock.unlock();\n ");
+		//	implSb.append("        lock.unlock();\n ");
 			implSb.append("             try {\n");
 			implSb.append("                     if (null != db) {\n");
 			implSb.append("                         db.endTransaction();\n");
 			implSb.append("                     }\n");
 			implSb.append("                 } catch (Exception e) {\n");
 			implSb.append("                     e.printStackTrace();\n");
+			implSb.append("     	            }\n");
 			implSb.append("     	            }\n");
 			implSb.append("             }\n");
 			implSb.append("             return true;\n");

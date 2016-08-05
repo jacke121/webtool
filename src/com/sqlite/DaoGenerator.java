@@ -56,17 +56,16 @@ public class DaoGenerator implements Generator {
 		implSb.append("import android.util.SparseArray;\n");
 		implSb.append("import android.database.sqlite.SQLiteStatement;\n");
 		implSb.append("import java.text.ParseException;\n");
-		implSb.append("import java.util.concurrent.locks.Lock;\n");
-		implSb.append("import java.util.concurrent.locks.ReentrantLock;\n");
+		implSb.append("import android.util.Log;\n");
+		implSb.append("import java.util.concurrent.locks.ReentrantReadWriteLock;\n");
 
 		implSb.append("\n\n");
 		implSb.append("public class " + NamingUtil.getClassName(tableName) + "Dao{\n");
-		implSb.append("Lock lock = new ReentrantLock();\n");
+		implSb.append("  ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();\n");
 		implSb.append("    SimpleDateFormat dfu = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\");\n");
 		implSb.append(" public static final String TABLENAME =\"" + NamingUtil.getClassName(tableName) + "\";\n");
 		implSb.append("  COLUMNINDEXS cOLUMNINDEXS=new COLUMNINDEXS();\n");
 		implSb.append("  COLUMNS cOLUMNS=new COLUMNS();\n");
-		implSb.append(" public final Object SYNC= new Object();\n");
 		implSb.append(" private final SQLiteOpenHelper mOpenHelper;\n");
 		implSb.append(" public " + NamingUtil.getClassName(tableName) + "Dao(SQLiteOpenHelper openHelper){\n");
 implSb.append("   mOpenHelper=openHelper;\n  ");
@@ -194,7 +193,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("                       SQLiteDatabase db = mOpenHelper.getWritableDatabase();\n");
 		implSb.append("   	            			String createdate= dfu.format(new Date());\n");
 		implSb.append("                      try {\n");
-		implSb.append("       synchronized(SYNC){\n");
+		implSb.append("       rwl.writeLock().lock();\n");
 		implSb.append("   	            String sql =\"update " +tableName+" set ");
 		
 		for (int i = 0; i < columns.size(); i++) {
@@ -252,9 +251,9 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("  		                }\n");		 
 		implSb.append("  		            }\n");		 
 		implSb.append("  		            db.setTransactionSuccessful();\n");
-		implSb.append("      }\n");
+		implSb.append("       rwl.writeLock().unlock();\n");
 		implSb.append("  		        } catch (Exception e) {\n");		 
-		implSb.append("  		            e.printStackTrace();\n");		 
+		implSb.append("  		          Log.e(\""+tableName+"updateList\", Log.getStackTraceString(e));\n");
 		implSb.append("             return false;\n");	
 		implSb.append("         } finally {\n");	
 		implSb.append("             try {\n");	
@@ -359,7 +358,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		implSb.append("     db.execSQL(\"drop table if exists " + NamingUtil.getClassName(tableName) + "\");\n");
 		implSb.append("     return true;\n");
 		implSb.append("     } catch (Exception e) {\n");
-		implSb.append("     e.printStackTrace();\n");
+		implSb.append("  		          Log.e(\""+tableName+"update\", Log.getStackTraceString(e));\n");
 		implSb.append("    return false;\n");
 		implSb.append("     }\n");
 		implSb.append("     }\n         }\n");
@@ -453,7 +452,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 			implSb.append("              if ( entity == null) {\n");
 			implSb.append("                  return false;\n");
 			implSb.append("              }\n");
-			implSb.append("       synchronized(SYNC){\n");
+			implSb.append("        rwl.writeLock().lock();\n");
 			implSb.append("                       SQLiteDatabase db = mOpenHelper.getWritableDatabase();\n");
 			implSb.append("                      try {\n");
 
@@ -524,7 +523,7 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 			implSb.append("                     e.printStackTrace();\n");
 			implSb.append("     	            }\n");
 			implSb.append("     	            }\n");
-			implSb.append("             }\n");
+			implSb.append("               rwl.writeLock().unlock();\n");
 			implSb.append("             return true;\n");
 			implSb.append("         }\n");
 

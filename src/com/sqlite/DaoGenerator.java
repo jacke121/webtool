@@ -447,7 +447,6 @@ implSb.append("   mOpenHelper=openHelper;\n  ");
 		
 		// 编辑
 		if (type == 1) {
-
 			implSb.append("       public boolean update(" + NamingUtil.getClassName(tableName) + " entity){\n ");
 			implSb.append("              if ( entity == null) {\n");
 			implSb.append("                  return false;\n");
